@@ -1,0 +1,12 @@
+# Pulsar · protecció bàsica (Apache)
+Options -Indexes
+DirectoryIndex index.php
+
+<FilesMatch "^(config\.php|composer\.(json|lock)|README\.md|\.gitignore)$">
+    Require all denied
+</FilesMatch>
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^(inc|storage|vendor|bin)(/|$) - [F,L]
+</IfModule>

@@ -1,0 +1,6 @@
+{
+    "name": "pulsar/app",
+    "require": {
+        "setasign/fpdf": "^1.8"
+    }
+}
