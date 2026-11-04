@@ -43,6 +43,32 @@ Els textos de cada idioma són a `inc/legal/{ca,es,en,fr}.php`.
 
 Els informes es desen com a JSON a `storage/reports/` i s’esborren automàticament passats `report_retention_days` dies.
 
+## API
+
+`api.php` analitza una pàgina per a una altra aplicació (p. ex. Asteroid, que mostra als clients un resum de la seva
+web) i en retorna un resum en JSON. Els tokens van a `config.local.php` (fora de git):
+
+```php
+<?php
+return ['api_tokens' => ['asteroid' => 'un-token-llarg-i-aleatori']];   // mínim 24 caràcters
+```
+
+```
+POST /api.php
+Authorization: Bearer un-token-llarg-i-aleatori
+Content-Type: application/json
+
+{"site": "www.exemple.cat/", "type": "seo"}        // type: seo | geo; site, millor sense https://
+```
+
+Resposta: `score` (0-100), `categories` (`{clau: {label, score}}`), `issues` (els `fail` i `warn` per ordre
+d’importància, amb `id`, `cat`, `status`, `title`, `detail`, `solution` i `weight`), `passed`, `total`, `final_url`,
+`error` i `report_id` (l’informe es desa com els altres: `seo.php?id=…`, i en PDF `report.php?type=seo&id=…`).
+L’`id` de cada comprovació és estable (categoria + títol sense xifres): serveix per comparar informes.
+
+L’`site` va sense `https://` perquè el tallafoc d’alguns allotjaments (Webempresa) bloqueja les peticions que porten
+una URL als paràmetres.
+
 ## Seguretat
 
 - Inici de sessió amb hash bcrypt, regeneració de la sessió, CSRF a tots els formularis i bloqueig per IP després de 5 intents fallits.

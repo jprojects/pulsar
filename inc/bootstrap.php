@@ -5,6 +5,10 @@ define('PULSAR_ROOT', dirname(__DIR__));
 define('PULSAR_VERSION', '1.0.1');
 
 $GLOBALS['pulsar_config'] = require PULSAR_ROOT . '/config.php';
+// Configuració del servidor (tokens de l’API…), fora de git
+if (is_file(PULSAR_ROOT . '/config.local.php')) {
+    $GLOBALS['pulsar_config'] = array_replace($GLOBALS['pulsar_config'], require PULSAR_ROOT . '/config.local.php');
+}
 
 date_default_timezone_set(config('timezone', 'Europe/Madrid'));
 mb_internal_encoding('UTF-8');
@@ -62,7 +66,7 @@ function is_https(): bool
 // Sessió
 // ---------------------------------------------------------------------------
 
-if (PHP_SAPI !== 'cli' && session_status() === PHP_SESSION_NONE) {
+if (PHP_SAPI !== 'cli' && !defined('PULSAR_API') && session_status() === PHP_SESSION_NONE) {
     session_name(config('session_name', 'pulsar_session'));
     session_set_cookie_params([
         'lifetime' => 0,
@@ -225,7 +229,7 @@ function save_report(string $type, array $data): string
     $data['id'] = $id;
     $data['type'] = $type;
     $data['created_at'] = date('c');
-    $data['user'] = current_user();
+    $data['user'] = current_user() ?? ($data['user'] ?? null);
     file_put_contents(storage_path("reports/{$type}_{$id}.json"), json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
     return $id;
 }
@@ -300,6 +304,19 @@ function parse_url_list(string $raw, int $max): array
 function score_class(int $score): string
 {
     return $score >= 80 ? 'good' : ($score >= 50 ? 'mid' : 'bad');
+}
+
+/**
+ * Identificador estable d’una comprovació (per a l’API: comparar informes, triar què es resol): la categoria i el
+ * títol sense les parts variables (xifres i el que hi ha entre parèntesis). "Ràtio text/HTML baixa (4 %)" →
+ * "content.ratio-text-html-baixa".
+ */
+function check_id(string $cat, string $title): string
+{
+    $t = preg_replace(['/\([^)]*\)/u', '/\d+/u'], '', $title) ?? $title;
+    $t = strtr(mb_strtolower($t), ['à' => 'a', 'á' => 'a', 'è' => 'e', 'é' => 'e', 'í' => 'i', 'ï' => 'i', 'ò' => 'o', 'ó' => 'o', 'ú' => 'u', 'ü' => 'u', 'ç' => 'c', 'ñ' => 'n', 'l·l' => 'll']);
+    $t = trim((string) preg_replace('/[^a-z0-9]+/', '-', $t), '-');
+    return $cat . '.' . ($t !== '' ? substr($t, 0, 60) : 'check');
 }
 
 /** Puntuació 0-100 a partir d’una llista de comprovacions ponderades. */

@@ -36,4 +36,8 @@ return [
 
     // Dies que es conserven els informes a storage/reports.
     'report_retention_days' => 30,
+
+    // API (api.php): nom => token. Posa'ls a config.local.php (fora de git), p. ex.
+    //   return ['api_tokens' => ['asteroid' => 'un-token-llarg-i-aleatori']];
+    'api_tokens' => [],
 ];

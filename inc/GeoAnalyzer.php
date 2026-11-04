@@ -86,7 +86,8 @@ final class GeoAnalyzer
 
     private function add(string $cat, string $status, string $title, string $detail, string $solution = '', float $weight = 1): void
     {
-        $this->checks[] = compact('cat', 'status', 'title', 'detail', 'solution', 'weight');
+        $id = check_id($cat, $title);
+        $this->checks[] = compact('id', 'cat', 'status', 'title', 'detail', 'solution', 'weight');
     }
 
     // -----------------------------------------------------------------------

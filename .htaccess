@@ -2,7 +2,7 @@
 Options -Indexes
 DirectoryIndex index.php
 
-<FilesMatch "^(config\.php|composer\.(json|lock)|README\.md|\.gitignore)$">
+<FilesMatch "^(config(\.local)?\.php|composer\.(json|lock)|README\.md|\.gitignore)$">
     Require all denied
 </FilesMatch>
 
