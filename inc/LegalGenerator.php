@@ -57,6 +57,7 @@ final class LegalGenerator
         'complianz' => ['Complianz', 'cmplz_*'],
         'borlabs'   => ['Borlabs Cookie', 'borlabs-cookie'],
         'iubenda'   => ['iubenda', '_iub_cs-*'],
+        'neutron'   => ['Neutron', 'neutron_consent'],
         'otro'      => [null, 'cookie_consent'],
     ];
 
